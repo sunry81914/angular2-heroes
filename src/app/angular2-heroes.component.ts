@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Routes, Router, ROUTER_DIRECTIVES } from '@angular/router';
 
 import { HeroesComponent } from './heroes/heroes.component';
+import { HeroDetailComponent } from './heroes/hero-detail.component';
+import { DashboardComponent } from './heroes/dashboard.component';
 
 @Component({
   moduleId: module.id,
@@ -13,6 +15,8 @@ import { HeroesComponent } from './heroes/heroes.component';
 })
 @Routes([
   { path: '/heroes', component: HeroesComponent },
+  { path: '/hero/:id', component: HeroDetailComponent },
+  { path: '/dashboard', component: DashboardComponent },
   { path: '*', component: HeroesComponent }
 ])
 export class Angular2HeroesAppComponent implements OnInit {
@@ -21,6 +25,6 @@ export class Angular2HeroesAppComponent implements OnInit {
   constructor(private router: Router) {}
 
   ngOnInit() {
-    this.router.navigate(['/heroes']);
+    this.router.navigate(['/dashboard']);
   }
 }
