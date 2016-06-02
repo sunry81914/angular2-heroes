@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { OnActivate, Router, RouteSegment } from '@angular/router';
 
-import { Hero } from '../shared/hero';
-import { HeroService } from '../shared/hero.service';
+import { Hero, HeroService } from '../shared';
+
 
 @Component({
   moduleId: module.id,
@@ -11,23 +11,47 @@ import { HeroService } from '../shared/hero.service';
   styleUrls: ['hero-detail.component.css'],
   providers: [HeroService]
 })
-export class HeroDetailComponent implements OnActivate {
-  hero: Hero;
+export class HeroDetailComponent implements OnInit, OnActivate {
+  @Input() hero: Hero;
+  @Output() close = new EventEmitter();
+  error: any;
+  navigated = false;  // true if navigated here
+  
+  private currSegment: RouteSegment;
   
   constructor(
     private router: Router,
     private heroService: HeroService
   ) {}
   
-  gotoHeroes() {
-    this.router.navigate(['/heroes']);
-    // window.history.back();
+  ngOnInit() {
+    if (this.currSegment === undefined) {
+      this.navigated = false;
+      this.hero = new Hero();
+    }
   }
   
   routerOnActivate(curr: RouteSegment){
-    // we convert the route parameter value to a number 
-    //  with the JavaScript (+) operator.
-    let id = +curr.getParam('id');
-    this.heroService.getHero(id).then(hero => this.hero = hero);
+      this.currSegment = curr;
+      this.navigated = true;
+      
+      // convert parameter value to a number with the JavaScript (+) operator.
+      let id = +curr.getParam('id');
+      this.heroService.getHero(id).then(hero => this.hero = hero);
   }
+   
+  save() {
+    this.heroService.save(this.hero)
+                    .then(hero => {
+                      this.hero = hero;  // saved hero, w/ id if new 
+                      this.goBack(hero);
+                    })
+                    .catch(error => this.error = error); // TODO: Display error msg
+  }
+   
+  goBack(savedHero: Hero = null) {
+    this.close.emit(savedHero);
+    if (this.navigated) { window.history.back(); }
+  }
+  
 }
