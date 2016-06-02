@@ -20,8 +20,11 @@ export class HeroService {
   }
   
   getHero(id: number | string) {
-    return this.getHeroes()
-               .then(heroes => heroes.filter(hero => hero.id === id)[0]);
+    let url = `${this.heroesApi}/${id}`;
+    return this.http.get(url)
+               .toPromise()
+               .then(resp => resp.json())
+               .catch(this.handleError);
   } 
   
   // Delete Hero
